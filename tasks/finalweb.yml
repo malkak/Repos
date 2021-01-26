@@ -1,0 +1,38 @@
+---
+- hosts: repo
+  tasks:
+   - name: copy file from repo to localhost
+     fetch:
+      src: /etc/tarzimbra/zcs-8.8.15_GA_3869.RHEL6_64.20190918004220.tgz
+      dest: /tmp/prefix-{{ inventory_hostname }}
+      flat: yes
+      remote_src: yes
+      mode: 0644
+
+- hosts: localhost 
+  tasks:
+   - name: copy zip files
+     command: cp -r /tmp/{{ item }} /home/demo/ansible/files/
+     with_items:
+      ['prefix-repo']
+#- hosts: localhost
+#  tasks:
+#    - name: copy file to Ansible-directory
+#      copy: 
+#       src: /tmp/{{item }}
+#       dest: /home/demo/ansible/files\
+#       remote_src: no
+#       mod: 0644
+#      owner: root
+#       group: root
+#      with_items: 
+#       ['prefix-repo']
+ 
+- hosts: web01
+  tasks:
+   - name: Copy files from localhost to web01
+     copy:
+      src: prefix-repo
+      dest: /tmp/zcs-8.8.15_GA_3869.RHEL6_64.20190918004220.tgz
+      #dest: /usr/local\ 
+      #dest: /tmp/prefix-repo.tgz

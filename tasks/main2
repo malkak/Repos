@@ -1,0 +1,36 @@
+---
+- hosts: web01
+  tasks:
+    - name: Include copy task      
+      inlude:   
+   - name: unpacking Zimbra OSE
+     unarchive:
+          src: /tmp/zcs-8.8.15_GA_3869.RHEL6_64.20190918004220.tgz
+          dest: /usr/local/src/
+   - name: Create the folder to upload the scripts
+     file:
+        path: /tmp/zcs
+        state: directory
+   - name: Uploading keystroke file
+     template:
+         src: 'installZimbra-keystrokes'
+         dest: /tmp/zcs/installZimbra-keystrokes
+         owner: root
+         group: root
+         mode: 0644
+   - name: Uploading installer configuration file
+     template:
+        src: 'configd'
+        dest: /tmp/zcs/installZimbraScript
+        owner: root
+        group: root
+        mode: 0644
+   - name: Installing Zimbra OSE
+     shell: ./install.sh -s < /tmp/zcs/installZimbra-keystrokes
+     args:
+       chdir: '/usr/local/src/zcs-8.8.15_GA_3869.RHEL6_64.20190918004220/'
+   - name: Configuring Zimbra OSE's services for use
+     command: ./zmsetup.pl -c /tmp/zcs/installZimbraScript
+     args:
+       chdir: /opt/zimbra/libexec/
+
